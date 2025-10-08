@@ -64,6 +64,7 @@ WHERE
 
 <details>
 <summary>実行結果</summary>
+
 ❌ WA: expected `500` but got `-500`
 </details>
 
@@ -88,6 +89,7 @@ GROUP BY
 
 <details>
 <summary>実行結果</summary>
+
 ✅ AC
 </details>
 
@@ -107,6 +109,7 @@ WHERE
 
 <details>
 <summary>実行結果</summary>
+
 ❌ RE: `column "残高" does not exist`
 </details>
 
@@ -127,6 +130,7 @@ WHERE
 
 <details>
 <summary>実行結果</summary>
+
 ❌ RE: `column "残高" does not exist`
 </details>
 
