@@ -68,7 +68,7 @@ for problem_dir in sorted(Path("problems").iterdir()):
             f.write("```\n\n")
 
             f.write("<details>\n")
-            f.write("<summary>実行結果</summary>\n")
+            f.write("<summary>実行結果</summary>\n\n")
             if query_result.stderr.strip():
                 error_msg = (
                     query_result.stderr.split("\n")[0].split("ERROR:")[1].strip()
