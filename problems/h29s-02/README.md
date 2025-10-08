@@ -1,6 +1,6 @@
 # h29s-02
 
-## schema
+## まずはこちらのスキーマをご覧ください
 
 ```sql
 CREATE TABLE 勘定 (勘定科目 TEXT PRIMARY KEY, 期首残高 INT NOT NULL);
@@ -15,9 +15,11 @@ CREATE TABLE 移動 (
 );
 ```
 
-## test-01
+## 問題
 
-### data
+勘定科目 "現金" の 2017 年 4 月 30 日における残高を導出するための SQL 文はどれか？
+
+## 入力例
 
 ```sql
 INSERT INTO
@@ -38,13 +40,13 @@ VALUES
     ('備品', '0001', 500);
 ```
 
-### expected
+## 出力例
 
 ```txt
 500
 ```
 
-### query-01
+## ア
 
 ```sql
 SELECT
@@ -61,11 +63,11 @@ WHERE
 ```
 
 <details>
-<summary>result</summary>
+<summary>実行結果</summary>
 ❌ WA: expected `500` but got `-500`
 </details>
 
-### query-02
+## イ
 
 ```sql
 SELECT
@@ -85,11 +87,11 @@ GROUP BY
 ```
 
 <details>
-<summary>result</summary>
+<summary>実行結果</summary>
 ✅ AC
 </details>
 
-### query-03
+## ウ
 
 ```sql
 SELECT
@@ -104,11 +106,11 @@ WHERE
 ```
 
 <details>
-<summary>result</summary>
+<summary>実行結果</summary>
 ❌ RE: `column "残高" does not exist`
 </details>
 
-### query-04
+## エ
 
 ```sql
 SELECT
@@ -124,7 +126,7 @@ WHERE
 ```
 
 <details>
-<summary>result</summary>
+<summary>実行結果</summary>
 ❌ RE: `column "残高" does not exist`
 </details>
 
