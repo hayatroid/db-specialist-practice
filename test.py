@@ -64,12 +64,15 @@ for problem_dir in sorted(Path("problems").iterdir()):
                 f.write(query_file.read_text())
                 f.write("```\n\n")
 
+                f.write("<details>\n")
+                f.write("<summary>result</summary>\n")
                 if query_result.stderr.strip():
                     error_msg = (
                         query_result.stderr.split("\n")[0].split("ERROR:")[1].strip()
                     )
-                    f.write(f"❌ RE: `{error_msg}`\n\n")
+                    f.write(f"❌ RE: `{error_msg}`\n")
                 elif actual == expected:
-                    f.write("✅ AC\n\n")
+                    f.write("✅ AC\n")
                 else:
-                    f.write(f"❌ WA: expected `{expected}` but got `{actual}`\n\n")
+                    f.write(f"❌ WA: expected `{expected}` but got `{actual}`\n")
+                f.write("</details>\n\n")
