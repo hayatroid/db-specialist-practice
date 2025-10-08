@@ -1,13 +1,17 @@
-# DB スぺ判定くん
+# DB スぺ練習くん
 
-## 使い方
+DB スぺの問題を解けるよ
 
-1. `problems/<problem-id>/schema.sql` にスキーマを記述
-2. `problems/<problem-id>/question.txt` に問題文を記述
-3. `problems/<problem-id>/input.sql` に入力例を記述
-4. `problems/<problem-id>/output.txt` に出力例を記述
-5. `problems/<problem-id>/query-[ア|イ|ウ|エ].sql` にクエリを記述
-6. Actions が走り、実行結果を `problems/<problem-id>/README.md` にてお知らせ
+デモはこちら 👉 [./h29s-02](https://github.com/hayatroid/db-specialist-practice/tree/main/problems/h29s-02)
+
+## 問題を追加するには
+
+1. `problems/<problem-id>/schema.sql` にスキーマを書くよ
+2. `problems/<problem-id>/question.txt` に問題文を書くよ
+3. `problems/<problem-id>/input.sql` に入力例を書くよ
+4. `problems/<problem-id>/output.txt` に出力例を書くよ
+5. `problems/<problem-id>/query-[ア|イ|ウ|エ].sql` にクエリを書くよ
+6. Actions が走り、問題が `problems/<problem-id>/README.md` に追加されるよ
 
 > [!WARNING]
-> 5. の正解のクエリのみ通すよう、3. のテストケースを設定すること。
+> 5. の選択肢のうち正解のクエリのみ通すよう、3. のテストケースを設定する必要があるよ
