@@ -60,7 +60,10 @@ WHERE
     AND 取引日 <= '2017-04-30'
 ```
 
+<details>
+<summary>result</summary>
 ❌ WA: expected `500` but got `-500`
+</details>
 
 ### query-02
 
@@ -81,7 +84,10 @@ GROUP BY
     期首残高
 ```
 
+<details>
+<summary>result</summary>
 ✅ AC
+</details>
 
 ### query-03
 
@@ -97,7 +103,10 @@ WHERE
     AND 取引日 <= '2017-04-30'
 ```
 
+<details>
+<summary>result</summary>
 ❌ RE: `column "残高" does not exist`
+</details>
 
 ### query-04
 
@@ -114,5 +123,8 @@ WHERE
     AND 取引日 <= '2017-04-30'
 ```
 
+<details>
+<summary>result</summary>
 ❌ RE: `column "残高" does not exist`
+</details>
 
