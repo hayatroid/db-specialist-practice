@@ -18,61 +18,64 @@ for problem_dir in sorted(Path("problems").iterdir()):
         f.write(f"# {problem_dir.name}\n\n")
 
         schema_file = problem_dir / "schema.sql"
-        f.write("## schema\n\n")
+        f.write("## まずはこちらのスキーマをご覧ください\n\n")
         f.write("```sql\n")
         f.write(schema_file.read_text())
         f.write("```\n\n")
 
-        for test_file in sorted(problem_dir.glob("test-*.sql")):
-            # >>> clean up and migrate >>>
-            subprocess.run(
-                ["psql", "-qc", "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"],
-                stderr=subprocess.DEVNULL,
+        question_file = problem_dir / "question.txt"
+        f.write("## 問題\n\n")
+        f.write(question_file.read_text() + "\n")
+
+        test_file = problem_dir / "input.sql"
+
+        # >>> clean up and migrate >>>
+        subprocess.run(
+            ["psql", "-qc", "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"],
+            stderr=subprocess.DEVNULL,
+        )
+        subprocess.run(["psql", "-qf", str(problem_dir / "schema.sql")])
+        subprocess.run(["psql", "-qf", str(test_file)])
+        # <<< clean up and migrate <<<
+
+        f.write("## 入力例\n\n")
+        f.write("```sql\n")
+        f.write(test_file.read_text())
+        f.write("```\n\n")
+
+        expected_file = problem_dir / "output.txt"
+
+        f.write("## 出力例\n\n")
+        f.write("```txt\n")
+        f.write(expected_file.read_text())
+        f.write("```\n\n")
+
+        for query_file in sorted(problem_dir.glob("query-*.sql")):
+            # >>> run query >>>
+            query_result = subprocess.run(
+                ["psql", "-At", "-f", str(query_file)],
+                capture_output=True,
+                text=True,
             )
-            subprocess.run(["psql", "-qf", str(problem_dir / "schema.sql")])
-            subprocess.run(["psql", "-qf", str(test_file)])
-            # <<< clean up and migrate <<<
+            # <<< run query <<<
 
-            f.write(f"## {test_file.stem}\n\n")
+            actual = query_result.stdout.strip()
+            expected = expected_file.read_text().strip()
 
-            f.write("### data\n\n")
+            f.write(f"## {query_file.stem.removeprefix('query-')}\n\n")
             f.write("```sql\n")
-            f.write(test_file.read_text())
+            f.write(query_file.read_text())
             f.write("```\n\n")
 
-            expected_file = test_file.with_suffix(".out")
-
-            f.write("### expected\n\n")
-            f.write("```txt\n")
-            f.write(expected_file.read_text())
-            f.write("```\n\n")
-
-            for query_file in sorted(problem_dir.glob("query-*.sql")):
-                # >>> run query >>>
-                query_result = subprocess.run(
-                    ["psql", "-At", "-f", str(query_file)],
-                    capture_output=True,
-                    text=True,
+            f.write("<details>\n")
+            f.write("<summary>実行結果</summary>\n")
+            if query_result.stderr.strip():
+                error_msg = (
+                    query_result.stderr.split("\n")[0].split("ERROR:")[1].strip()
                 )
-                # <<< run query <<<
-
-                actual = query_result.stdout.strip()
-                expected = expected_file.read_text().strip()
-
-                f.write(f"### {query_file.stem}\n\n")
-                f.write("```sql\n")
-                f.write(query_file.read_text())
-                f.write("```\n\n")
-
-                f.write("<details>\n")
-                f.write("<summary>result</summary>\n")
-                if query_result.stderr.strip():
-                    error_msg = (
-                        query_result.stderr.split("\n")[0].split("ERROR:")[1].strip()
-                    )
-                    f.write(f"❌ RE: `{error_msg}`\n")
-                elif actual == expected:
-                    f.write("✅ AC\n")
-                else:
-                    f.write(f"❌ WA: expected `{expected}` but got `{actual}`\n")
-                f.write("</details>\n\n")
+                f.write(f"❌ RE: `{error_msg}`\n")
+            elif actual == expected:
+                f.write("✅ AC\n")
+            else:
+                f.write(f"❌ WA: expected `{expected}` but got `{actual}`\n")
+            f.write("</details>\n\n")
