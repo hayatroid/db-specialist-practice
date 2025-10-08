@@ -12,40 +12,64 @@ os.environ.update(
 )
 
 for problem_dir in sorted(Path("problems").iterdir()):
-    print(f"{'👇' * 10} {problem_dir.name} {'👇' * 10}")
+    readme_file = problem_dir / "README.md"
 
-    for test_file in sorted(problem_dir.glob("test-*.sql")):
-        print(f"📝 {test_file.stem}")
+    with open(readme_file, "w") as f:
+        f.write(f"# {problem_dir.name}\n\n")
 
-        # >>> clean up and migrate >>>
-        subprocess.run(
-            ["psql", "-qc", "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"],
-            stderr=subprocess.DEVNULL,
-        )
-        subprocess.run(["psql", "-qf", str(problem_dir / "schema.sql")])
-        subprocess.run(["psql", "-qf", str(test_file)])
-        # <<< clean up and migrate <<<
+        schema_file = problem_dir / "schema.sql"
+        f.write("## schema\n\n")
+        f.write("```sql\n")
+        f.write(schema_file.read_text())
+        f.write("```\n\n")
 
-        for query_file in sorted(problem_dir.glob("query-*.sql")):
-            # >>> run query >>>
-            query_result = subprocess.run(
-                ["psql", "-At", "-f", str(query_file)],
-                capture_output=True,
-                text=True,
+        for test_file in sorted(problem_dir.glob("test-*.sql")):
+            # >>> clean up and migrate >>>
+            subprocess.run(
+                ["psql", "-qc", "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"],
+                stderr=subprocess.DEVNULL,
             )
-            # <<< run query <<<
+            subprocess.run(["psql", "-qf", str(problem_dir / "schema.sql")])
+            subprocess.run(["psql", "-qf", str(test_file)])
+            # <<< clean up and migrate <<<
 
-            actual = query_result.stdout.strip()
-            expected = test_file.with_suffix(".out").read_text().strip()
+            f.write(f"## {test_file.stem}\n\n")
 
-            if query_result.stderr.strip():
-                error_msg = (
-                    query_result.stderr.split("\n")[0].split("ERROR:")[1].strip()
+            f.write("### data\n\n")
+            f.write("```sql\n")
+            f.write(test_file.read_text())
+            f.write("```\n\n")
+
+            expected_file = test_file.with_suffix(".out")
+
+            f.write("### expected\n\n")
+            f.write("```txt\n")
+            f.write(expected_file.read_text())
+            f.write("```\n\n")
+
+            for query_file in sorted(problem_dir.glob("query-*.sql")):
+                # >>> run query >>>
+                query_result = subprocess.run(
+                    ["psql", "-At", "-f", str(query_file)],
+                    capture_output=True,
+                    text=True,
                 )
-                print(f"{query_file.stem}: RE ({error_msg})")
-            elif actual == expected:
-                print(f"{query_file.stem}: AC")
-            else:
-                print(f"{query_file.stem}: WA (expected={expected}, actual={actual})")
+                # <<< run query <<<
 
-    print()
+                actual = query_result.stdout.strip()
+                expected = expected_file.read_text().strip()
+
+                f.write(f"### {query_file.stem}\n\n")
+                f.write("```sql\n")
+                f.write(query_file.read_text())
+                f.write("```\n\n")
+
+                if query_result.stderr.strip():
+                    error_msg = (
+                        query_result.stderr.split("\n")[0].split("ERROR:")[1].strip()
+                    )
+                    f.write(f"❌ RE: `{error_msg}`\n\n")
+                elif actual == expected:
+                    f.write("✅ AC\n\n")
+                else:
+                    f.write(f"❌ WA: expected `{expected}` but got `{actual}`\n\n")
